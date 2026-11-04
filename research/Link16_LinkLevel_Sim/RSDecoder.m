@@ -1,29 +1,29 @@
 function dataOut_dc = RSDecoder(deinterwine_data, nn, kk)
-% RS解码函数
-% 输入参数:
-%   deinterwine_data: 输入的二进制数据
-%   nn: 编码后码字长度(信息段+监督段)
-%   kk: 信息段长度
-% 输出参数:
-%   dataOut_dc: 解码后的二进制数据
+% Reed-Solomon decoding function
+% Input parameters:
+%   deinterwine_data: Input binary data
+%   nn: Codeword length (message plus parity)
+%   kk: Message length
+% Output parameters:
+%   dataOut_dc: Decoded binary data
 
-% 初始化解码后的消息
+% Initialize decoded message
 dataOut_dc = [];
 
-% 计算每组处理的比特数
-m = log2(nn + 1); % RS码中每个符号的比特数
+% Calculate bits per group
+m = log2(nn + 1); % Bits per RS symbol
 bits_per_codeword = m * nn;
 
-% 将输入数据分组处理
+% Process input in groups
 num_codewords = floor(length(deinterwine_data) / bits_per_codeword);
 
 for i = 1:num_codewords
-    % 提取当前码字的数据
+    % Extract current codeword
     start_idx = (i-1) * bits_per_codeword + 1;
     end_idx = i * bits_per_codeword;
     codeword_bits = deinterwine_data(start_idx:end_idx);
     
-    % 将二进制数据转换为GF(2^m)域中的符号
+    % Convert binary data to symbols in GF(2^m)
     gf_symbols = zeros(1, nn);
     for j = 1:nn
         bit_start = (j-1) * m + 1;
@@ -34,13 +34,13 @@ for i = 1:num_codewords
         end
     end
     
-    % 创建RS解码器并解码
+    % Create RS decoder and decode
     rs_decoder = comm.RSDecoder('CodewordLength', nn, 'MessageLength', kk);
     try
-        % 直接使用数值，而不是gf对象
+        % Use numeric data directly rather than gf objects
         decoded_symbols = rs_decoder(gf_symbols');
         
-        % 将解码后的符号转换回二进制
+        % Convert decoded symbols back to binary
         decoded_bits = [];
         for j = 1:kk
             symbol_dec = decoded_symbols(j);
@@ -48,15 +48,15 @@ for i = 1:num_codewords
             decoded_bits = [decoded_bits, symbol_bits];
         end
     catch
-        % 如果解码失败，保留原始信息部分
+        % If decoding fails, keep original information portion
         decoded_bits = codeword_bits(1:m*kk);
     end
     
-    % 添加到解码后的消息
+    % Append to decoded message
     dataOut_dc = [dataOut_dc, decoded_bits];
 end
 
-% 处理剩余的比特
+% Process remaining bits
 if length(deinterwine_data) > num_codewords * bits_per_codeword
     remaining_bits = deinterwine_data(num_codewords * bits_per_codeword + 1:end);
     dataOut_dc = [dataOut_dc, remaining_bits];

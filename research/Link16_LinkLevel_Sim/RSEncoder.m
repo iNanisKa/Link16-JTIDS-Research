@@ -1,29 +1,29 @@
 function encoded_msg = RSEncoder(dataIn_crc, nn, kk)
-% RS编码函数
-% 输入参数:
-%   dataIn_crc: 输入的二进制数据
-%   nn: 编码后码字长度(信息段+监督段)
-%   kk: 信息段长度
-% 输出参数:
-%   encoded_msg: 编码后的二进制数据
+% Reed-Solomon encoding function
+% Input parameters:
+%   dataIn_crc: Input binary data
+%   nn: Codeword length (message plus parity)
+%   kk: Message length
+% Output parameters:
+%   encoded_msg: Encoded binary data
 
-% 初始化编码后的消息
+% Initialize encoded message
 encoded_msg = [];
 
-% 计算每组处理的比特数
-m = log2(nn + 1); % RS码中每个符号的比特数
+% Calculate bits per group
+m = log2(nn + 1); % Bits per RS symbol
 bits_per_group = m * kk;
 
-% 将输入数据分组处理
+% Process input in groups
 num_groups = floor(length(dataIn_crc) / bits_per_group);
 
 for i = 1:num_groups
-    % 提取当前组的数据
+    % Extract current group
     start_idx = (i-1) * bits_per_group + 1;
     end_idx = i * bits_per_group;
     group_data = dataIn_crc(start_idx:end_idx);
     
-    % 将二进制数据转换为GF(2^m)域中的符号
+    % Convert binary data to symbols in GF(2^m)
     gf_symbols = zeros(1, kk);
     for j = 1:kk
         bit_start = (j-1) * m + 1;
@@ -34,11 +34,11 @@ for i = 1:num_groups
         end
     end
     
-    % 创建RS编码器并编码
+    % Create RS encoder and encode
     rs_encoder = comm.RSEncoder('CodewordLength', nn, 'MessageLength', kk);
     encoded_symbols = rs_encoder(gf_symbols');
     
-    % 将编码后的符号转换回二进制
+    % Convert encoded symbols back to binary
     encoded_bits = [];
     for j = 1:nn
         symbol_dec = encoded_symbols(j);
@@ -46,7 +46,7 @@ for i = 1:num_groups
         encoded_bits = [encoded_bits, symbol_bits];
     end
     
-    % 添加到编码后的消息
+    % Append to encoded message
     encoded_msg = [encoded_msg, encoded_bits];
 end
 end

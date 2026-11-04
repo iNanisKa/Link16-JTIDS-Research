@@ -1,37 +1,37 @@
 function ccsk_dec = CCSKDemodulator(dmdBit, ccskcode)
-% CCSK解扩函数
-% 输入参数:
-%   dmdBit: 输入的扩频后二进制数据
-%   ccskcode: CCSK序列(32位)
-% 输出参数:
-%   ccsk_dec: 解扩后的二进制数据
+% CCSK despreading function
+% Input parameters:
+%   dmdBit: Input spread binary data
+%   ccskcode: CCSK sequence (32 bits)
+% Output parameters:
+%   ccsk_dec: Despread binary data
 
-% CCSK序列长度
+% CCSK sequence length
 n_ccsk = length(ccskcode);
 
-% 计算输入数据中包含的符号数
+% Calculate number of symbols in the input
 num_symbols = floor(length(dmdBit) / n_ccsk);
 
-% 初始化解扩后的数据
+% Initialize despread data
 ccsk_dec = zeros(1, num_symbols);
 
-% 生成循环移位后的CCSK序列（用于比较）
+% Generate cyclically shifted CCSK sequence for comparison
 shifted_code = [ccskcode(end); ccskcode(1:end-1)];
 
-% 对每个CCSK符号进行解扩
+% Despread each CCSK symbol
 for i = 1:num_symbols
-    % 提取当前CCSK符号
+    % Extract current CCSK symbol
     start_idx = (i-1) * n_ccsk + 1;
     end_idx = i * n_ccsk;
     current_symbol = dmdBit(start_idx:end_idx);
     
-    % 计算与原始CCSK序列的相关性
+    % Calculate correlation with original CCSK sequence
     corr_original = sum(current_symbol == ccskcode');
     
-    % 计算与移位CCSK序列的相关性
+    % Calculate correlation with shifted CCSK sequence
     corr_shifted = sum(current_symbol == shifted_code');
     
-    % 根据相关性判断原始比特
+    % Estimate original bit based on correlation
     if corr_shifted > corr_original
         ccsk_dec(i) = 1;
     else

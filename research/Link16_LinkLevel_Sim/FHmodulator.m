@@ -1,33 +1,33 @@
 function txFHmodulatedMat = FHmodulator(msgModMatrix, txFHtable, fs)
-% 跳频调制器函数
-% 输入参数:
-%   msgModMatrix: 调制后的信号矩阵，每行对应一个跳频点的数据
-%   txFHtable: 跳频频点表
-%   fs: 采样率
-% 输出参数:
-%   txFHmodulatedMat: 跳频调制后的信号矩阵
+% Frequency-hopping modulator function
+% Input parameters:
+%   msgModMatrix: Modulated signal matrix, one row per hop
+%   txFHtable: Frequency-hop table
+%   fs: Sampling rate
+% Output parameters:
+%   txFHmodulatedMat: Frequency-hopped signal matrix
 
-% 获取跳频点数和每跳的采样点数
+% Get hop count and samples per hop
 [HOP_NUM, samplesPerHop] = size(msgModMatrix);
 
-% 初始化输出矩阵
+% Initialize output matrix
 txFHmodulatedMat = zeros(HOP_NUM, samplesPerHop);
 
-% 对每个跳频点进行处理
+% Process each hop
 for hop = 1:HOP_NUM
-    % 获取当前跳频点的频率
+    % Get current hop frequency
     freq = txFHtable(hop);
     
-    % 获取当前跳频点的基带信号
+    % Get current hop baseband signal
     baseband_signal = msgModMatrix(hop, :);
     
-    % 生成时间向量
+    % Generate time vector
     t = (0:samplesPerHop-1) / fs;
     
-    % 上变频到指定频点
+    % Upconvert to selected frequency
     carrier = exp(1j * 2 * pi * freq * t);
     
-    % 跳频调制
+    % Frequency-hop modulation
     txFHmodulatedMat(hop, :) = baseband_signal .* carrier;
 end
 

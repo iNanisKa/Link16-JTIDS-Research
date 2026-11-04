@@ -1,55 +1,55 @@
 function [biNRZ, txSig] = MSKmodulator(samp, TX_BIT_MAT)
-% MSK调制器函数
-% 输入参数:
-%   samp: 过采样倍数
-%   TX_BIT_MAT: 输入的二进制数据矩阵，每行对应一个跳频点的数据
-% 输出参数:
-%   biNRZ: 双极性NRZ信号
-%   txSig: MSK调制后的信号
+% MSK modulator function
+% Input parameters:
+%   samp: Oversampling factor
+%   TX_BIT_MAT: Input binary matrix, one hop per row
+% Output parameters:
+%   biNRZ: Bipolar NRZ signal
+%   txSig: MSK-modulated signal
 
-% 获取矩阵维度
+% Get matrix dimensions
 [num_hops, bits_per_hop] = size(TX_BIT_MAT);
 
-% 初始化输出
+% Initialize output
 biNRZ = zeros(num_hops, bits_per_hop);
 txSig = zeros(num_hops, samp * bits_per_hop);
 
-% MSK参数
-h = 0.5;  % 调制指数，MSK固定为0.5
+% MSK parameters
+h = 0.5;  % Modulation index; MSK uses 0.5
 
 for hop = 1:num_hops
-    % 获取当前跳频点的比特
+    % Get bits for current hop
     bits = TX_BIT_MAT(hop, :);
     
-    % 转换为双极性NRZ信号 (0->-1, 1->1)
+    % Convert to bipolar NRZ (0->-1, 1->1)
     biNRZ(hop, :) = 2 * bits - 1;
     
-    % 初始化I和Q分量
+    % Initialize I and Q components
     I_phase = zeros(1, samp * bits_per_hop);
     Q_phase = zeros(1, samp * bits_per_hop);
     
-    % 生成I和Q分量的相位
+    % Generate I and Q component phases
     for i = 1:bits_per_hop
         bit_idx = (i-1)*samp+1:i*samp;
         t = (0:samp-1) / samp;
         
-        if mod(i, 2) == 1  % 奇数位影响I分量
+        if mod(i, 2) == 1  % Odd-numbered bits affect I component
             I_phase(bit_idx) = biNRZ(hop, i) * cos(pi*t/2);
-        else  % 偶数位影响Q分量
+        else  % Even-numbered bits affect Q component
             Q_phase(bit_idx) = biNRZ(hop, i) * sin(pi*t/2);
         end
     end
     
-    % 生成载波
+    % Generate carriers
     t_full = (0:samp*bits_per_hop-1)/samp;
     carrier_I = cos(2*pi*0.25*t_full);
     carrier_Q = sin(2*pi*0.25*t_full);
     
-    % 调制
+    % Modulation
     I_signal = I_phase .* carrier_I;
     Q_signal = Q_phase .* carrier_Q;
     
-    % 复信号表示
+    % Complex signal representation
     txSig(hop, :) = I_signal + 1j * Q_signal;
 end
 

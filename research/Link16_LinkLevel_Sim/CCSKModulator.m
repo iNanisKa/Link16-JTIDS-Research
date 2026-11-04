@@ -1,30 +1,30 @@
 function ccsk_msg = CCSKModulator(interwine_msg, ccskcode)
-% CCSK扩频函数
-% 输入参数:
-%   interwine_msg: 输入的二进制数据
-%   ccskcode: CCSK序列(32位)
-% 输出参数:
-%   ccsk_msg: 扩频后的二进制数据
+% CCSK spreading function
+% Input parameters:
+%   interwine_msg: Input binary data
+%   ccskcode: CCSK sequence (32 bits)
+% Output parameters:
+%   ccsk_msg: Spread binary data
 
-% 初始化扩频后的消息
+% Initialize spread message
 ccsk_msg = [];
 
-% CCSK序列长度
+% CCSK sequence length
 n_ccsk = length(ccskcode);
 
-% 处理每个输入比特
+% Process each input bit
 for i = 1:length(interwine_msg)
     if interwine_msg(i) == 0
-        % 如果输入比特为0，直接使用CCSK序列
+        % If input bit is zero, use original CCSK sequence
         spread_bits = ccskcode';
     else
-        % 如果输入比特为1，使用CCSK序列的循环移位版本
-        % Link16使用的是循环右移1位
+        % If input bit is one, use cyclically shifted CCSK sequence
+        % Upstream example uses a one-bit cyclic right shift
         shifted_code = [ccskcode(end); ccskcode(1:end-1)];
         spread_bits = shifted_code';
     end
     
-    % 添加到扩频后的消息
+    % Append to spread message
     ccsk_msg = [ccsk_msg, spread_bits];
 end
 
