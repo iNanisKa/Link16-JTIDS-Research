@@ -1,69 +1,47 @@
-# Link16通信系统仿真
+# Link16 Link-Level Simulation — MATLAB Research Copy
 
-## 项目概述
+> English documentation for the public MATLAB research project originally created by [shaohua0720](https://github.com/shaohua0720/Link16_LinkLevel_Sim). This is an **unverified offline experiment**, not a certified or operational Link 16 implementation.
 
-本项目是一个Link16通信系统的MATLAB仿真实现，主要模拟了Link16系统的关键特性，包括调制解调、跳频、编码、交织和CCSK扩频等功能。该仿真系统可用于分析不同参数配置下Link16系统的性能表现。
+## Project overview
 
-## 系统特性
+The MATLAB source explores digital communication simulations and performance measurement: modulation/demodulation, error-correction coding, matrix interleaving, simplified CCSK spreading, a frequency-hopping experimental path and bit-error-rate (BER) plots.
 
-- **调制方式**：支持BPSK、QPSK、16QAM、64QAM和MSK
-- **跳频技术**：支持快速跳频，可配置跳频速率和频点数量
-- **编码技术**：支持RS(31,15)编码和(2,1,7)卷积编码
-- **交织技术**：支持矩阵交织，提高抗干扰能力
-- **扩频技术**：支持CCSK扩频，增强抗干扰性能
-- **CRC校验**：支持CRC校验，提高数据可靠性
+## File guide
 
-## 主要文件
+| File | Description |
+| --- | --- |
+| `Link16.m` | Main simulation experiment and BER performance chart |
+| `CCSKModulator.m`, `CCSKDemodulator.m` | Simplified spreading and despreading routines |
+| `FHmodulator.m`, `FHdemodulator.m` | Frequency-hopping signal simulation helpers |
+| `MSKmodulator.m`, `MSKdemodulator.m` | Custom MSK simulation routines |
+| `MSK_test.m` | BER and waveform tests |
+| `MSK_debug.m` | Debug plots and correlation visualizations |
+| `RSEncoder.m`, `RSDecoder.m` | Reed–Solomon coding experiments |
 
-- `Link16.m`：主仿真程序，包含系统参数设置、信号处理和性能分析
-- `MSKmodulator.m`：MSK调制器实现
-- `LSY_CCSKde32.m`：CCSK解扩频实现
-- `LSY_RSCode.m`：RS编码实现
+## Upstream feature list
 
-## 使用方法
+The original author describes BPSK, QPSK, 16QAM, 64QAM, MSK, hopping, RS(31,15), convolutional coding, interleaving, CCSK, CRC, and BER analysis. These are descriptions of source-code paths, **not independently verified operational capabilities**.
 
-1. 在MATLAB中打开`Link16.m`文件
-2. 根据需要调整系统参数：
-   - `ENABLE_FH`：控制是否启用跳频（0：不跳频，1：跳频）
-   - `MODULATION_TYPE`：选择调制方式（0：BPSK，1：QPSK，2：16QAM，3：64QAM，4：MSK）
-   - `ENABLE_CRC`：控制是否启用CRC校验（0：不使用，1：使用）
-   - `CODING_TYPE`：选择编码方式（0：不编码，1：RS编码，2：卷积编码）
-   - `ENABLE_INTERLEAVING`：控制是否启用交织（0：不使用，1：使用）
-   - `ENABLE_CCSK`：控制是否启用CCSK扩频（0：不使用，1：使用）
-3. 运行程序，观察误比特率性能曲线
+## Reading the project
 
-## 系统参数
+1. Open `Link16.m` in MATLAB Editor.
+2. Review the inline settings `ENABLE_FH`, `MODULATION_TYPE`, `ENABLE_CRC`, `CODING_TYPE`, `ENABLE_INTERLEAVING`, and `ENABLE_CCSK`.
+3. Inspect the processing modules and test scripts; MATLAB and additional toolboxes may be required.
 
-- **比特率**：50Kb/s
-- **采样率**：1MHz（过采样倍数：20）
-- **跳频速率**：1000跳/秒
-- **跳频带宽**：5MHz
-- **跳频频点数**：25个频点
-- **中心频率**：3MHz
-- **RS编码参数**：RS(31,15)，每符号5比特
-- **卷积编码参数**：(2,1,7)，约束长度7
-- **CCSK序列长度**：32位
+**Execution status:** No MATLAB run or numerical validation has been performed for this mirror. The English translation is limited to documentation, comments and human-facing text.
 
-## 性能分析
+## Source inconsistencies
 
-系统通过在不同信噪比(Eb/No)下的误比特率(BER)分析来评估性能。仿真结果以半对数坐标图形式展示，可直观比较不同配置下的系统性能。
+- The Chinese README lists `LSY_CCSKde32.m` and `LSY_RSCode.m`, but those files are not in the archived repository.
+- Some parameter descriptions in the original README differ from numeric settings in the code.
+- The original SNR-sweep comment does not match the actual `snrValues` expression; the English review preserves the source expression.
 
-## 版本信息
+## Provenance and rights
 
-- 当前版本：v1.0.0
-- 最后更新：`git describe --tags`
-- 构建日期：`date +%Y-%m-%d`
+Original repository: https://github.com/shaohua0720/Link16_LinkLevel_Sim
 
-## 注意事项
+Archived upstream Git tree: `67ac9a7e710e94713b8717a5eaa55fcd0410e618`.
 
-- MSK调制器使用`comm.MSKModulator`类，需要正确设置`InitialPhaseOffset`属性
-- 在使用跳频功能时，确保发送和接收使用相同的跳频序列
-- 系统性能与参数配置密切相关，建议根据具体应用场景调整参数
+The upstream tree contains **no LICENSE file**. A publicly accessible GitHub repository is not necessarily licensed for redistribution or derivative work. Keep the original attribution and obtain copyright-holder permission before distributing modified copies. The MIT license elsewhere in this parent repository does **not** automatically apply to these MATLAB files.
 
-## 未来改进
-
-- 添加更多调制方式支持
-- 优化跳频序列生成算法
-- 增加自适应编码调制功能
-- 实现更复杂的信道模型
-- 添加时间同步和频率同步功能
+See [SOURCE_AND_LICENSE.md](SOURCE_AND_LICENSE.md).
